@@ -1,0 +1,15 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: config-server
+  # Câu 1: Chế độ "native" - đọc các file cấu hình từ thư mục config-repo của project.
+  #        Chạy Config Server từ thư mục gốc của project để ./config-repo được nhận diện đúng.
+  profiles:
+    active: native
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: file:./config-repo

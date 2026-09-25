@@ -1,0 +1,32 @@
+# ======================================================================
+# CẤU HÌNH DÙNG CHUNG CHO TẤT CẢ SERVICE (được Config Server phân phát)
+# File này áp dụng cho mọi service; cấu hình riêng nằm ở <service-name>.yml
+# ======================================================================
+
+# Câu 1: Mọi service đăng ký vào Eureka qua địa chỉ dùng chung này
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    prefer-ip-address: true
+
+spring:
+  # Câu 3: Địa chỉ Kafka broker dùng chung
+  kafka:
+    bootstrap-servers: localhost:9092
+
+# Câu 5: Log SLF4J - hiển thị log nghiệp vụ của package com.shopmart ở mức INFO
+logging:
+  level:
+    com.shopmart: INFO
+
+# Actuator: mở endpoint health + circuitbreakers (phục vụ Câu 2)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,circuitbreakers,circuitbreakerevents
+  endpoint:
+    health:
+      show-details: always

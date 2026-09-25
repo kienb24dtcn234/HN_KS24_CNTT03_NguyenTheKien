@@ -1,0 +1,17 @@
+server:
+  port: 8761
+
+spring:
+  application:
+    name: eureka-server
+
+# Câu 1: Eureka Server tự nó không đăng ký chính mình và không fetch registry từ nơi khác
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  server:
+    # Tắt self-preservation khi chạy local để dashboard phản ánh trạng thái thật nhanh hơn
+    enable-self-preservation: false

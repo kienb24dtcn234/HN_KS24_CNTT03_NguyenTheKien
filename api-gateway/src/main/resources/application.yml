@@ -1,0 +1,37 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      # Câu 1: Bật auto-route theo serviceId trong Eureka, đồng thời khai báo route tường minh bên dưới
+      discovery:
+        locator:
+          enabled: false
+      routes:
+        - id: order-service
+          uri: lb://order-service        # lb:// -> Load Balancing qua Eureka
+          predicates:
+            - Path=/api/order/**
+        - id: inventory-service
+          uri: lb://inventory-service
+          predicates:
+            - Path=/api/inventory/**
+        - id: payment-service
+          uri: lb://payment-service
+          predicates:
+            - Path=/api/payment/**
+
+# Câu 1: Đăng ký Gateway vào Eureka
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    prefer-ip-address: true
+
+logging:
+  level:
+    org.springframework.cloud.gateway: INFO

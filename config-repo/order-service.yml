@@ -1,0 +1,48 @@
+# ==========================================================
+# Cấu hình RIÊNG cho order-service (Config Server phân phát)
+# ==========================================================
+server:
+  port: 8081
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/shopmart_order?createDatabaseIfNotExist=true
+    username: root
+    password: 123456
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+
+  # Câu 3: Kafka producer/consumer cho order-service (orchestrator của Saga)
+  kafka:
+    consumer:
+      group-id: order-service-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+        spring.json.use.type.headers: false
+        spring.json.value.default.type: com.shopmart.order.event.OrderEvent
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+# Câu 2: Circuit Breaker cho lời gọi sang inventory-service
+resilience4j:
+  circuitbreaker:
+    instances:
+      inventory-service:
+        register-health-indicator: true
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        failure-rate-threshold: 50          # >=50% lỗi -> mở mạch (OPEN)
+        wait-duration-in-open-state: 10s    # giữ OPEN 10s rồi chuyển HALF_OPEN
+        permitted-number-of-calls-in-half-open-state: 3
+        automatic-transition-from-open-to-half-open-enabled: true
+
+# Câu 2: URL gốc để log/health của Feign (tên service trong Eureka)
+inventory:
+  service-name: inventory-service
